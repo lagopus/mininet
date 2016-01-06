@@ -418,6 +418,25 @@ function ivs {
     sudo make install
 }
 
+function lagopus {
+    echo "Installing Lagopus Virtual Switch..."
+
+    LAGOPUS_SRC=$BUILD_DIR/lagopus
+
+    # Install dependencies
+    $install git pkg-config gcc make build-essential libexpat-dev libgmp-dev \
+             libssl-dev libpcap-dev byacc flex \
+             python-dev
+
+    # Install lagopus from source
+    cd $BUILD_DIR
+    git clone git://github.com/lagopus/lagopus $LAGOPUS_SRC --recursive
+    cd $LAGOPUS_SRC
+    ./configure
+    make
+    sudo make install
+
+}
 # Install RYU
 function ryu {
     echo "Installing RYU..."
@@ -681,9 +700,10 @@ function all {
     # mn_dev
     of
     install_wireshark
-    ovs
+    # ovs
     # We may add ivs once it's more mature
     # ivs
+    lagopus
     # NOX-classic is deprecated, but you can install it manually if desired.
     # nox
     pox
@@ -740,7 +760,7 @@ exit 0
 }
 
 function usage {
-    printf '\nUsage: %s [-abcdfhikmnprtvVwxy03]\n\n' $(basename $0) >&2
+    printf '\nUsage: %s [-abcdfhiklmnprtvVwxy03]\n\n' $(basename $0) >&2
 
     printf 'This install script attempts to install useful packages\n' >&2
     printf 'for Mininet. It should (hopefully) work on Ubuntu 11.10+\n' >&2
@@ -758,6 +778,7 @@ function usage {
     printf -- ' -h: print this (H)elp message\n' >&2
     printf -- ' -i: install (I)ndigo Virtual Switch\n' >&2
     printf -- ' -k: install new (K)ernel\n' >&2
+    printf -- ' -l: install (L)agopus Virtual Switch\n' >&2
     printf -- ' -m: install Open vSwitch kernel (M)odule from source dir\n' >&2
     printf -- ' -n: install Mini(N)et dependencies + core files\n' >&2
     printf -- ' -p: install (P)OX OpenFlow Controller\n' >&2
@@ -780,7 +801,7 @@ if [ $# -eq 0 ]
 then
     all
 else
-    while getopts 'abcdefhikmnprs:tvV:wxy03' OPTION
+    while getopts 'abcdefhiklmnprs:tvV:wxy03' OPTION
     do
       case $OPTION in
       a)    all;;
@@ -796,6 +817,7 @@ else
       h)    usage;;
       i)    ivs;;
       k)    kernel;;
+      l)    lagopus;;
       m)    modprobe;;
       n)    mn_deps;;
       p)    pox;;
